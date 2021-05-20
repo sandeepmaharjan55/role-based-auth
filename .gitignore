@@ -117,3 +117,6 @@ dist
 
 #role
 /role/.env
+
+#vscode
+.vscode
