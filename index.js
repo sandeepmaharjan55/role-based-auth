@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const path = require('path')
 const {mongoDbUrl}= require("./config/database");
 const User = require('./models/userModel')
-const routes = require('./routes/home/route.js');
+const routes = require('./routes/home/index.js');
 const handlebars = require('express-handlebars');
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
@@ -18,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 mongoose
- .connect(mongoDbUrl, { useNewUrlParser: true })
+ .connect(mongoDbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
  .then(() => {
   console.log('Connected to the Database successfully');
  });
@@ -47,7 +47,12 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 app.use(cookieParser('secret'))
-app.use(session({cookie: {maxAge: null}}))
+app.use(session({
+  secret: 'RoleAuth',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {maxAge: null }
+}))
 
 //flash message middleware
 app.use((req, res, next)=>{

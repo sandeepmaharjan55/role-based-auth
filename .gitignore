@@ -116,7 +116,7 @@ dist
 .pnp.*
 
 #role
-role/.env
+.env
 
 #vscode
 .vscode

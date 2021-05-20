@@ -2,22 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../../controllers/userController');
-const User = require('../../models/userModel');
 
 router.post('/signup', userController.signup);
 
 router.post('/login', userController.login);
 
 router.get('/index', (req, res) => {
-console.log(req.session.email);
-    // User.findOne({_id: req.params.id})
-    // .then(user =>{
-
-    //     res.render('/index', {user: user});
-    //         });
+    console.log(req.session);
     res.render('index', {layout: 'register'});
 });
-
 
 router.get('/user/:userId', userController.allowIfLoggedin, userController.getUser);
 

@@ -30,25 +30,41 @@ exports.signup = async (req, res, next) => {
   }
   else{
     //  console.log(req.body.email, req.body.password)
-    const { email, password, role } = req.body
-    const hashedPassword = await hashPassword(password);
-    const newUser = new User({ email, password: hashedPassword, role: role || "basic" });
-    const accessToken = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-     expiresIn: "1d"
-    });
-    newUser.accessToken = accessToken;
-    await newUser.save();
-    // res.json({
-    //  data: newUser,
-    //  accessToken
-    // })
-    req.session.message = {
-      type: 'success',
-      intro: 'You are now registered! ',
-      message: 'Please log in.'
+    const duplicateUser = await User.findOne({email: req.body.email });
+
+    if(duplicateUser!=null)
+    {
+      req.session.message = {
+        type: 'danger',
+        intro: 'Email already exists ',
+        message: 'Use different email'
+      }
+
+       res.redirect('/');
+    }
+    else
+    {
+      const { email, password, role } = req.body;
+      const hashedPassword = await hashPassword(password);
+      const newUser = new User({ email, password: hashedPassword, role: role || "basic" });
+      const accessToken = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+       expiresIn: "1d"
+      });
+      newUser.accessToken = accessToken;
+      await newUser.save();
+      // res.json({
+      //  data: newUser,
+      //  accessToken
+      // })
+      req.session.message = {
+        type: 'success',
+        intro: 'You are now registered! ',
+        message: 'Please log in.'
+      }
+
+       res.redirect('/login');
     }
 
-     res.redirect('/login');
   }
  } catch (error) {
   next(error)
@@ -88,7 +104,7 @@ exports.login = async (req, res, next) => {
   //  data: { email: user.email, role: user.role },
   //  accessToken
   // })
-  res.redirect('/index')
+  res.redirect('/index');
 }
  } catch (error) {
   next(error);
