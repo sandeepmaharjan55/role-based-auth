@@ -1,4 +1,3 @@
-// server/roles.js
 const AccessControl = require("accesscontrol");
 const ac = new AccessControl();
 

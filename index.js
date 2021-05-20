@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const path = require('path')
-const User = require('./role/models/userModel')
-const routes = require('./role/routes/route.js');
+const {mongoDbUrl}= require("./config/database");
+const User = require('./models/userModel')
+const routes = require('./routes/home/route.js');
 const handlebars = require('express-handlebars');
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 require("dotenv").config({
- path: path.join(__dirname, "/role/.env")
+ path: path.join(__dirname, ".env")
 });
 
 const app = express();
@@ -17,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 mongoose
- .connect('mongodb://localhost:27017/rolebased')
+ .connect(mongoDbUrl, { useNewUrlParser: true })
  .then(() => {
   console.log('Connected to the Database successfully');
  });
@@ -68,9 +69,6 @@ app.engine('hbs', handlebars({
 app.get('/', (req, res) => {
     //Using the index.hbs file instead of planB
     res.render('register', {layout: 'register'});});
-app.get('/index', (req, res) => {
-      //Using the index.hbs file instead of planB
-      res.render('index', {layout: 'register'});});
 app.get('/login', (req, res) => {
       //Using the index.hbs file instead of planB
 res.render('login', {layout: 'register'});});

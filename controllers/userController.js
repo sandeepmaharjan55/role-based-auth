@@ -1,8 +1,7 @@
-// server/controllers/userController.js
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { roles } = require('../roles')
+const { roles } = require('../roles/roles')
 async function hashPassword(password) {
  return await bcrypt.hash(password, 10);
 }
@@ -13,7 +12,7 @@ async function validatePassword(plainPassword, hashedPassword) {
 
 exports.signup = async (req, res, next) => {
  try {
-  if(req.body.email=='' || req.body.password=='' || req.body.confirm == ''|| req.body.role == ''){
+  if(req.body.email=='' || req.body.password=='' || req.body.confirm == ''){
     req.session.message = {
       type: 'danger',
       intro: 'Empty fields! ',
@@ -30,7 +29,7 @@ exports.signup = async (req, res, next) => {
     res.redirect('/')
   }
   else{
-     console.log(req.body.email, req.body.password)
+    //  console.log(req.body.email, req.body.password)
     const { email, password, role } = req.body
     const hashedPassword = await hashPassword(password);
     const newUser = new User({ email, password: hashedPassword, role: role || "basic" });
@@ -83,9 +82,8 @@ exports.login = async (req, res, next) => {
   req.session.message = {
     type: 'success',
     intro: 'You are Logged in! ',
-    message: 'Welcome'
+    message: 'Welcome '+user.email
   }
-
   //  res.status(200).json({
   //  data: { email: user.email, role: user.role },
   //  accessToken
