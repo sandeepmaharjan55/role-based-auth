@@ -6,14 +6,15 @@ const path = require('path')
 const User = require('./role/models/userModel')
 const routes = require('./role/routes/route.js');
 const handlebars = require('express-handlebars');
-
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
 require("dotenv").config({
  path: path.join(__dirname, "/role/.env")
 });
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 mongoose
  .connect('mongodb://localhost:27017/rolebased')
@@ -40,6 +41,20 @@ app.use(async (req, res, next) => {
    next();
   }
 });
+//middlewares
+app.use(express.static('public'))
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+app.use(cookieParser('secret'))
+app.use(session({cookie: {maxAge: null}}))
+
+//flash message middleware
+app.use((req, res, next)=>{
+  res.locals.message = req.session.message
+  delete req.session.message
+  next()
+})
+
 //handlebars
 app.set('view engine', 'hbs');
 app.engine('hbs', handlebars({
@@ -49,12 +64,16 @@ app.engine('hbs', handlebars({
     //new configuration parameter
     partialsDir: __dirname + '/views/partials/'
     }));
-app.use(express.static('public'))
+//end handlebars
 app.get('/', (req, res) => {
     //Using the index.hbs file instead of planB
     res.render('register', {layout: 'register'});});
-//end handlebars
-
+app.get('/index', (req, res) => {
+      //Using the index.hbs file instead of planB
+      res.render('index', {layout: 'register'});});
+app.get('/login', (req, res) => {
+      //Using the index.hbs file instead of planB
+res.render('login', {layout: 'register'});});
 app.use('/', routes); app.listen(PORT, () => {
   console.log('Server is listening on Port:', PORT)
 })

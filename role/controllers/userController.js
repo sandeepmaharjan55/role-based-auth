@@ -1,5 +1,4 @@
 // server/controllers/userController.js
-
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -14,18 +13,44 @@ async function validatePassword(plainPassword, hashedPassword) {
 
 exports.signup = async (req, res, next) => {
  try {
-  const { email, password, role } = req.body
-  const hashedPassword = await hashPassword(password);
-  const newUser = new User({ email, password: hashedPassword, role: role || "basic" });
-  const accessToken = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-   expiresIn: "1d"
-  });
-  newUser.accessToken = accessToken;
-  await newUser.save();
-  res.json({
-   data: newUser,
-   accessToken
-  })
+  if(req.body.email=='' || req.body.password=='' || req.body.confirm == ''|| req.body.role == ''){
+    req.session.message = {
+      type: 'danger',
+      intro: 'Empty fields! ',
+      message: 'Please insert the requested information.'
+    }
+    res.redirect('/')
+  }
+  else if(req.body.password != req.body.confirm){
+    req.session.message = {
+      type: 'danger',
+      intro: 'Passwords do not match! ',
+      message: 'Please make sure to insert the same password.'
+    }
+    res.redirect('/')
+  }
+  else{
+     console.log(req.body.email, req.body.password)
+    const { email, password, role } = req.body
+    const hashedPassword = await hashPassword(password);
+    const newUser = new User({ email, password: hashedPassword, role: role || "basic" });
+    const accessToken = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+     expiresIn: "1d"
+    });
+    newUser.accessToken = accessToken;
+    await newUser.save();
+    // res.json({
+    //  data: newUser,
+    //  accessToken
+    // })
+    req.session.message = {
+      type: 'success',
+      intro: 'You are now registered! ',
+      message: 'Please log in.'
+    }
+
+     res.redirect('/login');
+  }
  } catch (error) {
   next(error)
  }
@@ -33,6 +58,15 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
  try {
+  if(req.body.email=='' || req.body.password==''){
+    req.session.message = {
+      type: 'danger',
+      intro: 'Empty fields! ',
+      message: 'Please insert the requested information.'
+    }
+    res.redirect('/login')
+  }
+   else{
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) return next(new Error('Email does not exist'));
@@ -42,10 +76,22 @@ exports.login = async (req, res, next) => {
    expiresIn: "1d"
   });
   await User.findByIdAndUpdate(user._id, { accessToken })
-  res.status(200).json({
-   data: { email: user.email, role: user.role },
-   accessToken
-  })
+  // res.status(200).json({
+  //  data: { email: user.email, role: user.role },
+  //  accessToken
+  // })
+  req.session.message = {
+    type: 'success',
+    intro: 'You are Logged in! ',
+    message: 'Welcome'
+  }
+
+  //  res.status(200).json({
+  //  data: { email: user.email, role: user.role },
+  //  accessToken
+  // })
+  res.redirect('/index')
+}
  } catch (error) {
   next(error);
  }
