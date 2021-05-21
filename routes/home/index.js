@@ -7,11 +7,15 @@ router.post('/signup', userController.signup);
 
 router.post('/login', userController.login);
 
-router.get('/index', (req, res) => {
-    console.log(req.session);
-    res.render('index', {layout: 'register'});
-});
-
+// router.get('/', (req, res) => {
+//     console.log(req.session.userMail);
+//     userName=req.session.userMail
+//     // res.render('index', user:userName);
+//     res.render("index", {
+//         user:userName
+//     });
+// });
+router.get('/logout', userController.logout);
 router.get('/user/:userId', userController.allowIfLoggedin, userController.getUser);
 
 router.get('/users', userController.allowIfLoggedin, userController.grantAccess('readAny', 'profile'), userController.getUsers);

@@ -104,14 +104,23 @@ exports.login = async (req, res, next) => {
   //  data: { email: user.email, role: user.role },
   //  accessToken
   // })
-  res.redirect('/index');
+  req.session.userMail=user.email;
+  res.redirect('/');
 }
  } catch (error) {
   next(error);
  }
 }
 
-
+exports.logout = async (req, res, next) => {
+  try {
+    req.session.destroy();
+    res.redirect('/');
+  }
+  catch (error) {
+    next(error)
+   }
+  }
 exports.getUsers = async (req, res, next) => {
  const users = await User.find({});
  res.status(200).json({

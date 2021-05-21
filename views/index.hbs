@@ -1,3 +1,13 @@
-HEllO
-{{!-- {{#if user}}{{user.email}}{{/if}}--}}
-after login in
+{{#if user}}
+<div class="col-xs-4  col-md-push-4">
+    <strong> HEllO user {{user}}</strong>
+    <a href="/logout" class="btn btn-default btn-flat">Sign out</a>
+</div>
+{{else}}
+<div class="col-xs-4 col-md-2 col-md-push-4">
+    <a href="/login" class="btn btn-default btn-flat">Login</a>
+</div>
+<div class="col-xs-4 col-md-2 col-md-push-4">
+    <a href="/signup" class="btn btn-default btn-flat">Register</a>
+</div>
+{{/if}}
